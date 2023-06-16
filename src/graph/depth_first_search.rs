@@ -1,4 +1,34 @@
-use std::collections::VecDeque;
+use std::collections::{HashSet, VecDeque};
+
+fn depth_first_search(graph: &Graph, start: Vertex, objective: Vertex) -> Option<Vec<u32>>{
+    let mut visited: HashSet<Vertex> = HashSet::new();
+    let mut history: Vec<u32> = Vec::new();
+    let mut queue = VecDeque::new();
+    queue.push_back(start);
+
+    // Get first vertex of queue while there are still vertices in it.
+    while let Some(current) = queue.pop_front(){
+        // Add the current vertex to the history of visited vertices.
+        history.push(current.value());
+
+        // Check if current vertex is the objective.
+        if current == objective {
+            // Return the Optional with history of visited vertices.
+            return Some(history);
+        }
+
+        // Loop through all vertices adjacent to the current vertex.
+        for adjacent in current.adjacent_vertices(graph).into_iter() {
+            // Insert adjacent vertex into visited if not visited yet.
+            if visited.insert(adjacent) {
+                // Add the adjacent vertex to the front of the queue.
+                queue.push_front(adjacent);
+            }
+        }
+    }
+
+    None
+}
 
 // Data Structures.
 
@@ -25,7 +55,7 @@ impl Vertex {
         self.0
     }
 
-    pub fn neighbors(&self, graph: &Graph) -> VecDeque<Vertex> {
+    pub fn adjacent_vertices(&self, graph: &Graph) -> VecDeque<Vertex> {
         graph
             .edges
             .iter()
